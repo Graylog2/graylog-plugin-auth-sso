@@ -19,35 +19,32 @@ public class HttpHeadersAuthMetaData implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "HttpHeadersAuth";
+        return "Trusted HTTP Headers Authentication Provider";
     }
 
     @Override
     public String getAuthor() {
-        // TODO Insert author name
-        return "HttpHeadersAuth author";
+        return "Graylog, Inc";
     }
 
     @Override
     public URI getURL() {
-        // TODO Insert correct plugin website
         return URI.create("https://www.graylog.org/");
     }
 
     @Override
     public Version getVersion() {
-        return new Version(1, 0, 0);
+        return Version.from(1, 0, 0);
     }
 
     @Override
     public String getDescription() {
-        // TODO Insert correct plugin description
-        return "Description of HttpHeadersAuth plugin";
+        return "Authentication provider based on trusted HTTP headers (SSO)";
     }
 
     @Override
     public Version getRequiredVersion() {
-        return new Version(2, 0, 0);
+        return Version.from(2, 1, 0, "SNAPSHOT");
     }
 
     @Override

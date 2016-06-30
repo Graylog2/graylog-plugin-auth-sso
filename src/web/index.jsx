@@ -1,5 +1,6 @@
 import packageJson from '../../package.json';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import TrustedHttpHeadersConfig from "./TrustedHttpHeadersConfig";
 
 PluginStore.register(new PluginManifest(packageJson, {
   /* This is the place where you define which entities you are providing to the web interface.
@@ -18,4 +19,13 @@ PluginStore.register(new PluginManifest(packageJson, {
   // navigation: [
   //  { path: '/sample', description: 'Sample' },
   // ]
+  authenticatorConfigurations: [
+    {
+      name: 'trusted-headers',
+      displayName: 'Trusted HTTP Headers',
+      description: 'Creates and authenticates users based on HTTP headers set by a proxy, useful for SSO systems',
+      canBeDisabled: true,
+      component: TrustedHttpHeadersConfig,
+    },
+  ]
 }));
