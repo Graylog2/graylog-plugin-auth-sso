@@ -29,12 +29,10 @@ public class HttpHeadersAuth extends AuthenticatingRealm {
         HttpHeadersToken headersToken = (HttpHeadersToken) token;
         final MultivaluedMap<String, String> requestHeaders = headersToken.getHeaders();
 
-        log.info("Looking at headers {}", requestHeaders);
         if (requestHeaders.containsKey("remote-user")) {
-            // TODO refactor user creation
-
             final String userName = requestHeaders.getFirst("remote-user");
-            log.info("Trusted header {} set, continuing with user name {}", "Remote-User", userName);
+            log.trace("Trusted header {} set, continuing with user name {}", "Remote-User", userName);
+
             ShiroSecurityContext.requestSessionCreation(true);
             return new SimpleAccount(userName, null, NAME);
         }

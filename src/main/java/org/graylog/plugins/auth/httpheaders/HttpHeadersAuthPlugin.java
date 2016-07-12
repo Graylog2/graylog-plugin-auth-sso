@@ -7,9 +7,6 @@ import org.graylog2.plugin.PluginModule;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * Implement the Plugin interface here.
- */
 public class HttpHeadersAuthPlugin implements Plugin {
     @Override
     public PluginMetaData metadata() {
@@ -18,6 +15,6 @@ public class HttpHeadersAuthPlugin implements Plugin {
 
     @Override
     public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new HttpHeadersAuthModule());
+        return Collections.singletonList(new HttpHeadersAuthModule());
     }
 }
