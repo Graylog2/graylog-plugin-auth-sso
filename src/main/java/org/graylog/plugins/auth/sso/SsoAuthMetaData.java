@@ -1,4 +1,4 @@
-package org.graylog.plugins.auth.httpheaders;
+package org.graylog.plugins.auth.sso;
 
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -11,15 +11,15 @@ import java.util.Set;
 /**
  * Implement the PluginMetaData interface here.
  */
-public class HttpHeadersAuthMetaData implements PluginMetaData {
+public class SsoAuthMetaData implements PluginMetaData {
     @Override
     public String getUniqueId() {
-        return "org.graylog.plugins.auth.httpheaders.HttpHeadersAuthPlugin";
+        return "org.graylog.plugins.auth.sso.SsoAuthPlugin";
     }
 
     @Override
     public String getName() {
-        return "Trusted HTTP Headers Authentication Provider";
+        return "Single Sign-On (SSO) Authentication Provider";
     }
 
     @Override
@@ -39,7 +39,7 @@ public class HttpHeadersAuthMetaData implements PluginMetaData {
 
     @Override
     public String getDescription() {
-        return "Authentication provider based on trusted HTTP headers (SSO)";
+        return "SSO Authentication provider";
     }
 
     @Override

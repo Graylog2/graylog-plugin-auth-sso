@@ -2,25 +2,25 @@ import React from "react";
 import Reflux from "reflux";
 import { Row, Col, Input, Button } from "react-bootstrap";
 
-import TrustedHeadersActions from "TrustedHeadersActions";
-import TrustedHeadersStore from "TrustedHeadersStore";
+import SsoAuthActions from "SsoAuthActions";
+import SsoAuthStore from "SsoAuthStore";
 
 import Spinner from "components/common/Spinner";
 import PageHeader from "components/common/PageHeader";
 import ObjectUtils from 'util/ObjectUtils';
 
-const TrustedHttpHeadersConfig = React.createClass({
+const SsoConfiguration = React.createClass({
   mixins: [
-    Reflux.connect(TrustedHeadersStore),
+    Reflux.connect(SsoAuthStore),
   ],
 
   componentDidMount() {
-    TrustedHeadersActions.config();
+    SsoAuthActions.config();
   },
 
   _saveSettings(ev) {
     ev.preventDefault();
-    TrustedHeadersActions.saveConfig(this.state.config);
+    SsoAuthActions.saveConfig(this.state.config);
   },
 
   _setSetting(attribute, value) {
@@ -50,7 +50,7 @@ const TrustedHttpHeadersConfig = React.createClass({
       content = (
         <Row>
           <Col lg={8}>
-            <form id="trusted-headers-form" className="form-horizontal" onSubmit={this._saveSettings}>
+            <form id="sso-config-form" className="form-horizontal" onSubmit={this._saveSettings}>
               <fieldset>
                 <legend className="col-sm-12">Header configuration</legend>
                 <Input type="text" id="username_header" name="username_header" labelClassName="col-sm-3"
@@ -78,7 +78,7 @@ const TrustedHttpHeadersConfig = React.createClass({
                        wrapperClassName="col-sm-9" label="Default User Role"
                        help="The default Graylog role determines whether a user created can access the entire system, or has limited access.">
                   <Row>
-                    <Col sm={4}>
+                    <Col sm={6}>
                       <select id="default_group" name="default_group" className="form-control" required
                               value={this.state.config.default_group}
                               onChange={this._bindValue} disabled={!this.state.config.auto_create_user}>
@@ -94,7 +94,7 @@ const TrustedHttpHeadersConfig = React.createClass({
                 <legend className="col-sm-12">Store settings</legend>
                 <div className="form-group">
                   <Col sm={9} smOffset={3}>
-                    <Button type="submit" bsStyle="success">Save authenticator settings</Button>
+                    <Button type="submit" bsStyle="success">Save SSO settings</Button>
                   </Col>
                 </div>
               </fieldset>
@@ -106,8 +106,8 @@ const TrustedHttpHeadersConfig = React.createClass({
 
     return (
       <div>
-        <PageHeader title="Trusted HTTP headers (SSO)" subpage>
-          <span>Configuration page for the trusted HTTP headers authenticator.</span>
+        <PageHeader title="Single Sign-On Configuration" subpage>
+          <span>Configuration page for the SSO authenticator.</span>
           {null}
         </PageHeader>
         {content}
@@ -116,4 +116,4 @@ const TrustedHttpHeadersConfig = React.createClass({
   },
 });
 
-export default TrustedHttpHeadersConfig;
+export default SsoConfiguration;

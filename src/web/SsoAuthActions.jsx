@@ -1,8 +1,8 @@
 import Reflux from 'reflux';
 
-const TrustedHeadersActions = Reflux.createActions({
+const SsoAuthActions = Reflux.createActions({
   config: { asyncResult: true },
   saveConfig: { asyncResult: true },
 });
 
-export default TrustedHeadersActions;
+export default SsoAuthActions;

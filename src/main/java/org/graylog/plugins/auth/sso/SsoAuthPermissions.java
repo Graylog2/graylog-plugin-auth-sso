@@ -1,4 +1,4 @@
-package org.graylog.plugins.auth.httpheaders;
+package org.graylog.plugins.auth.sso;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.security.Permission;
@@ -9,14 +9,14 @@ import java.util.Set;
 
 import static org.graylog2.plugin.security.Permission.create;
 
-public class TrustedHeaderRestPermissions implements PluginPermissions {
+public class SsoAuthPermissions implements PluginPermissions {
 
-    public static final String CONFIG_READ = "trustedheaderauthconfig:read";
-    public static final String CONFIG_UPDATE = "trustedheaderauthconfig:edit";
+    public static final String CONFIG_READ = "ssoauthconfig:read";
+    public static final String CONFIG_UPDATE = "ssoauthconfig:edit";
 
     private final ImmutableSet<Permission> permissions = ImmutableSet.of(
-            create(CONFIG_READ, "Read trusted HTTP header authenticator config"),
-            create(CONFIG_UPDATE, "Update trusted HTTP header authenticator config")
+            create(CONFIG_READ, "Read SSO authenticator config"),
+            create(CONFIG_UPDATE, "Update SSO authenticator config")
     );
 
     @Override

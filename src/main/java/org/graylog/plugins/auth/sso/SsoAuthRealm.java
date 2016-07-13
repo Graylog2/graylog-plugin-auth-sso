@@ -1,4 +1,4 @@
-package org.graylog.plugins.auth.httpheaders;
+package org.graylog.plugins.auth.sso;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -22,19 +22,19 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 import java.util.Optional;
 
-public class HttpHeadersAuth extends AuthenticatingRealm {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpHeadersAuth.class);
+public class SsoAuthRealm extends AuthenticatingRealm {
+    private static final Logger LOG = LoggerFactory.getLogger(SsoAuthRealm.class);
 
-    public static final String NAME = "trusted-headers";
+    public static final String NAME = "sso";
 
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
     private final RoleService roleService;
 
     @Inject
-    public HttpHeadersAuth(UserService userService,
-                           ClusterConfigService clusterConfigService,
-                           RoleService roleService) {
+    public SsoAuthRealm(UserService userService,
+                        ClusterConfigService clusterConfigService,
+                        RoleService roleService) {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
         this.roleService = roleService;
@@ -48,9 +48,9 @@ public class HttpHeadersAuth extends AuthenticatingRealm {
         HttpHeadersToken headersToken = (HttpHeadersToken) token;
         final MultivaluedMap<String, String> requestHeaders = headersToken.getHeaders();
 
-        final TrustedHeaderAuthenticatorConfig config = clusterConfigService.getOrDefault(
-                TrustedHeaderAuthenticatorConfig.class,
-                TrustedHeaderAuthenticatorConfig.defaultConfig());
+        final SsoAuthConfig config = clusterConfigService.getOrDefault(
+                SsoAuthConfig.class,
+                SsoAuthConfig.defaultConfig());
 
         final String usernameHeader = config.usernameHeader();
 

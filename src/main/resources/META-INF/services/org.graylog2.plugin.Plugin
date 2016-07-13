@@ -1,1 +1,1 @@
-org.graylog.plugins.auth.httpheaders.HttpHeadersAuthPlugin
+org.graylog.plugins.auth.sso.SsoAuthPlugin

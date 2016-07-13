@@ -1,15 +1,15 @@
 import Reflux from 'reflux';
 
-import TrustedHeadersActions from 'TrustedHeadersActions';
+import SsoAuthActions from 'SsoAuthActions';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-const urlPrefix = '/plugins/org.graylog.plugins.auth.httpheaders';
+const urlPrefix = '/plugins/org.graylog.plugins.auth.sso';
 
-const TrustedHeadersStore = Reflux.createStore({
-  listenables: [TrustedHeadersActions],
+const SsoAuthStore = Reflux.createStore({
+  listenables: [SsoAuthActions],
 
   getInitialState() {
     return {
@@ -41,9 +41,9 @@ const TrustedHeadersStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ config: response });
-    }, this._errorHandler('Fetching config failed', 'Could not retrieve trusted HTTP headers authenticator config'));
+    }, this._errorHandler('Fetching config failed', 'Could not retrieve SSO authenticator config'));
 
-    TrustedHeadersActions.config.promise(promise);
+    SsoAuthActions.config.promise(promise);
   },
 
   saveConfig(config) {
@@ -51,11 +51,11 @@ const TrustedHeadersStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ config: response });
-      UserNotification.success('trusted HTTP headers authenticator configuration was updated successfully');
-    }, this._errorHandler('Updating authenticator config failed', 'Unable to update trusted HTTP headers authenticator config'));
+      UserNotification.success('SSO configuration was updated successfully');
+    }, this._errorHandler('Updating SSO config failed', 'Unable to update SSO authenticator config'));
 
-    TrustedHeadersActions.saveConfig.promise(promise);
+    SsoAuthActions.saveConfig.promise(promise);
   },
 });
 
-export default TrustedHeadersStore;
+export default SsoAuthStore;

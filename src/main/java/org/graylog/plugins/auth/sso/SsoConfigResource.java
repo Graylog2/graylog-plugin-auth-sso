@@ -1,4 +1,4 @@
-package org.graylog.plugins.auth.httpheaders;
+package org.graylog.plugins.auth.sso;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,32 +18,32 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Api(value = "AuthHttpHeaders/Config", description = "Manage trusted HTTP headers authenticator configuration")
+@Api(value = "SSO/Config", description = "Manage SSO authenticator configuration")
 @Path("/config")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class TrustedHeaderConfigResource extends RestResource implements PluginRestResource {
+public class SsoConfigResource extends RestResource implements PluginRestResource {
 
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    private TrustedHeaderConfigResource(ClusterConfigService clusterConfigService) {
+    private SsoConfigResource(ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
     }
 
-    @ApiOperation(value = "Get authenticator configuration")
+    @ApiOperation(value = "Get SSO configuration")
     @GET
-    @RequiresPermissions(TrustedHeaderRestPermissions.CONFIG_READ)
-    public TrustedHeaderAuthenticatorConfig get() {
-        return clusterConfigService.getOrDefault(TrustedHeaderAuthenticatorConfig.class,
-                                                 TrustedHeaderAuthenticatorConfig.defaultConfig());
+    @RequiresPermissions(SsoAuthPermissions.CONFIG_READ)
+    public SsoAuthConfig get() {
+        return clusterConfigService.getOrDefault(SsoAuthConfig.class,
+                                                 SsoAuthConfig.defaultConfig());
     }
 
-    @ApiOperation(value = "Update authenticator configuration")
+    @ApiOperation(value = "Update SSO configuration")
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
-    @RequiresPermissions(TrustedHeaderRestPermissions.CONFIG_UPDATE)
-    public TrustedHeaderAuthenticatorConfig update(@ApiParam(name = "config", required = true) @NotNull TrustedHeaderAuthenticatorConfig config) {
+    @RequiresPermissions(SsoAuthPermissions.CONFIG_UPDATE)
+    public SsoAuthConfig update(@ApiParam(name = "config", required = true) @NotNull SsoAuthConfig config) {
         clusterConfigService.write(config);
         return config;
     }

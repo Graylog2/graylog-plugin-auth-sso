@@ -1,4 +1,4 @@
-package org.graylog.plugins.auth.httpheaders;
+package org.graylog.plugins.auth.sso;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,15 +8,15 @@ import com.google.auto.value.AutoValue;
 import javax.annotation.Nullable;
 
 @AutoValue
-@JsonDeserialize(builder = AutoValue_TrustedHeaderAuthenticatorConfig.Builder.class)
+@JsonDeserialize(builder = AutoValue_SsoAuthConfig.Builder.class)
 @JsonAutoDetect
-public abstract class TrustedHeaderAuthenticatorConfig {
+public abstract class SsoAuthConfig {
 
     public static Builder builder() {
-        return new AutoValue_TrustedHeaderAuthenticatorConfig.Builder();
+        return new AutoValue_SsoAuthConfig.Builder();
     }
 
-    public static TrustedHeaderAuthenticatorConfig defaultConfig() {
+    public static SsoAuthConfig defaultConfig() {
         return builder()
                 .usernameHeader("Remote-User")
                 .autoCreateUser(true)
@@ -43,7 +43,7 @@ public abstract class TrustedHeaderAuthenticatorConfig {
 
     @AutoValue.Builder
     public static abstract class Builder {
-        abstract TrustedHeaderAuthenticatorConfig build();
+        abstract SsoAuthConfig build();
 
         @JsonProperty("username_header")
         public abstract Builder usernameHeader(String usernameHeader);
