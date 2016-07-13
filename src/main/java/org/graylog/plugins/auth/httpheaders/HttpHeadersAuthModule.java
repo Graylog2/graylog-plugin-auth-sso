@@ -11,5 +11,7 @@ public class HttpHeadersAuthModule extends PluginModule {
     @Override
     protected void configure() {
         authenticationRealmBinder().addBinding(HttpHeadersAuth.NAME).to(HttpHeadersAuth.class).in(Scopes.SINGLETON);
+        addRestResource(TrustedHeaderConfigResource.class);
+        addPermissions(TrustedHeaderRestPermissions.class);
     }
 }
