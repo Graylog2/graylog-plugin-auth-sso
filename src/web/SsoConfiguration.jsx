@@ -1,6 +1,6 @@
 import React from "react";
 import Reflux from "reflux";
-import { Row, Col, Input, Button } from "react-bootstrap";
+import { Row, Col, Input, Button, Alert } from "react-bootstrap";
 
 import SsoAuthActions from "SsoAuthActions";
 import SsoAuthStore from "SsoAuthStore";
@@ -47,6 +47,22 @@ const SsoConfiguration = React.createClass({
     if (!this.state.config) {
       content = <Spinner />;
     } else {
+      let trustedProxies = null;
+      if (this.state.config.trusted_proxies) {
+        trustedProxies = <span>
+          The current subnet setting is: <code>{this.state.config.trusted_proxies}</code>. You can configure the setting in the Graylog server configuration file.
+        </span>;
+      } else {
+        trustedProxies = <Alert bsStyle="danger">
+          <h4 style={{ marginBottom: 5 }}>There are no trusted proxies set!</h4>
+          <span>Please configure the <code>trusted_proxies</code> setting in the Graylog server configuration file.</span>
+        </Alert>;
+      }
+      const subnetHelp = (<span>
+        Enable this to require the request containing the SSO header as directly coming from a trusted proxy. This is highly recommended to avoid header injection.
+        <br/>
+        {trustedProxies}
+      </span>);
       content = (
         <Row>
           <Col lg={8}>
@@ -57,6 +73,15 @@ const SsoConfiguration = React.createClass({
                        wrapperClassName="col-sm-9" placeholder="Remote-User" label="Username Header"
                        value={this.state.config.username_header} help="HTTP header containing the implicitly trusted name of the Graylog user"
                        onChange={this._bindValue} required/>
+              </fieldset>
+              <fieldset>
+                <legend className="col-sm-12">Security</legend>
+                <Input type="checkbox" label="Request must come from a trusted proxy"
+                       help={subnetHelp}
+                       wrapperClassName="col-sm-offset-3 col-sm-9"
+                       name="require_trusted_proxies"
+                       checked={this.state.config.require_trusted_proxies}
+                       onChange={this._bindChecked}/>
               </fieldset>
               <fieldset>
                 <legend className="col-sm-12">User creation</legend>

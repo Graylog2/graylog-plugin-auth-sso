@@ -32,10 +32,14 @@ public abstract class SsoAuthConfig {
         return new AutoValue_SsoAuthConfig.Builder();
     }
 
-    public static SsoAuthConfig defaultConfig() {
+    public abstract Builder toBuilder();
+
+    public static SsoAuthConfig defaultConfig(String trustedProxies) {
         return builder()
                 .usernameHeader("Remote-User")
                 .autoCreateUser(true)
+                .requireTrustedProxies(true)
+                .trustedProxies(trustedProxies)
                 .build();
     }
 
@@ -57,6 +61,13 @@ public abstract class SsoAuthConfig {
     @JsonProperty("auto_create_user")
     public abstract boolean autoCreateUser();
 
+    @JsonProperty("require_trusted_proxies")
+    public abstract boolean requireTrustedProxies();
+
+    @JsonProperty("trusted_proxies")
+    @Nullable
+    public abstract String trustedProxies();
+
     @AutoValue.Builder
     public static abstract class Builder {
         abstract SsoAuthConfig build();
@@ -75,6 +86,12 @@ public abstract class SsoAuthConfig {
 
         @JsonProperty("auto_create_user")
         public abstract Builder autoCreateUser(boolean autoCreateUser);
+
+        @JsonProperty("require_trusted_proxies")
+        public abstract Builder requireTrustedProxies(boolean requireTrustedProxies);
+
+        @JsonProperty("trusted_proxies")
+        public abstract Builder trustedProxies(@Nullable String trustedProxies);
 
     }
 }

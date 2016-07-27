@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.auth.sso;
 
+import com.google.common.base.Joiner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,8 +25,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,6 +36,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 @Api(value = "SSO/Config", description = "Manage SSO authenticator configuration")
 @Path("/config")
@@ -41,18 +45,22 @@ import javax.ws.rs.core.MediaType;
 public class SsoConfigResource extends RestResource implements PluginRestResource {
 
     private final ClusterConfigService clusterConfigService;
+    private final String trustedProxies;
 
     @Inject
-    private SsoConfigResource(ClusterConfigService clusterConfigService) {
+    private SsoConfigResource(ClusterConfigService clusterConfigService,
+                              @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         this.clusterConfigService = clusterConfigService;
+        this.trustedProxies = Joiner.on(", ").join(trustedProxies);
     }
 
     @ApiOperation(value = "Get SSO configuration")
     @GET
     @RequiresPermissions(SsoAuthPermissions.CONFIG_READ)
     public SsoAuthConfig get() {
-        return clusterConfigService.getOrDefault(SsoAuthConfig.class,
-                                                 SsoAuthConfig.defaultConfig());
+        final SsoAuthConfig config = clusterConfigService.getOrDefault(SsoAuthConfig.class,
+                                                                       SsoAuthConfig.defaultConfig(trustedProxies));
+        return config.toBuilder().trustedProxies(trustedProxies).build();
     }
 
     @ApiOperation(value = "Update SSO configuration")
@@ -60,7 +68,10 @@ public class SsoConfigResource extends RestResource implements PluginRestResourc
     @PUT
     @RequiresPermissions(SsoAuthPermissions.CONFIG_UPDATE)
     public SsoAuthConfig update(@ApiParam(name = "config", required = true) @NotNull SsoAuthConfig config) {
-        clusterConfigService.write(config);
+        // we do not want to store trustedProxies in the cluster config because it is not editable in the UI
+        final SsoAuthConfig cleanConfig = config.toBuilder().trustedProxies(null).build();
+        clusterConfigService.write(cleanConfig);
+        // return the original one because the UI needs to see the trustedProxies again. Well, this time I _am_ sorry.
         return config;
     }
 

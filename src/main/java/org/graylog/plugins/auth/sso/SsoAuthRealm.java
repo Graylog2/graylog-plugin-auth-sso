@@ -29,14 +29,18 @@ import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.core.MultivaluedMap;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 public class SsoAuthRealm extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SsoAuthRealm.class);
@@ -46,14 +50,17 @@ public class SsoAuthRealm extends AuthenticatingRealm {
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
     private final RoleService roleService;
+    private final Set<IpSubnet> trustedProxies;
 
     @Inject
     public SsoAuthRealm(UserService userService,
                         ClusterConfigService clusterConfigService,
-                        RoleService roleService) {
+                        RoleService roleService,
+                        @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
         this.roleService = roleService;
+        this.trustedProxies = trustedProxies;
         setAuthenticationTokenClass(HttpHeadersToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
         setCachingEnabled(false);
@@ -66,12 +73,23 @@ public class SsoAuthRealm extends AuthenticatingRealm {
 
         final SsoAuthConfig config = clusterConfigService.getOrDefault(
                 SsoAuthConfig.class,
-                SsoAuthConfig.defaultConfig());
+                SsoAuthConfig.defaultConfig(""));
 
         final String usernameHeader = config.usernameHeader();
 
         final Optional<String> userNameOption = headerValue(requestHeaders, usernameHeader);
         if (userNameOption.isPresent()) {
+            final boolean inTrustedSubnets = trustedProxies.stream()
+                    .anyMatch(ipSubnet -> {
+                        try {
+                            return ipSubnet.contains(headersToken.getRemoteAddr());
+                        } catch (UnknownHostException e) {
+                            return false;
+                        }
+                    });
+            if (config.requireTrustedProxies() && !inTrustedSubnets) {
+                return null;
+            }
             final String username = userNameOption.get();
             User user = userService.load(username);
             if (user == null) {
