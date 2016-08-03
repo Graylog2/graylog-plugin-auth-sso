@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.auth.sso;
 
+import com.google.common.base.Joiner;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -83,11 +84,16 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                     .anyMatch(ipSubnet -> {
                         try {
                             return ipSubnet.contains(headersToken.getRemoteAddr());
-                        } catch (UnknownHostException e) {
+                        } catch (UnknownHostException ignored) {
+                            LOG.debug("Looking up remote address {} failed.", headersToken.getRemoteAddr());
                             return false;
                         }
                     });
             if (config.requireTrustedProxies() && !inTrustedSubnets) {
+                LOG.info("Request with trusted header {} received from {} which is not in the trusted subnets: {}",
+                         usernameHeader,
+                         headersToken.getRemoteAddr(),
+                         Joiner.on(", ").join(trustedProxies));
                 return null;
             }
             final String username = userNameOption.get();
@@ -147,6 +153,7 @@ public class SsoAuthRealm extends AuthenticatingRealm {
             ShiroSecurityContext.requestSessionCreation(true);
             return new SimpleAccount(user.getName(), null, NAME);
         }
+        LOG.debug("Trusted header {} is not set.", usernameHeader);
         return null;
     }
 
