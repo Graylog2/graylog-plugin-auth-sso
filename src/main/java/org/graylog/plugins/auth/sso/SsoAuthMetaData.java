@@ -60,7 +60,7 @@ public class SsoAuthMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return Version.from(2, 1, 0, "SNAPSHOT");
+        return Version.from(2, 1, 0);
     }
 
     @Override
