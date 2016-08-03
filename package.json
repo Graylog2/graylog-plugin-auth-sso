@@ -1,10 +1,10 @@
 {
-  "name": "HttpHeadersAuth",
+  "name": "SsoAuthPlugin",
   "version": "1.0.0-SNAPSHOT",
   "description": "",
   "repository": {
     "type": "git",
-    "url": "github.com:Graylog2/graylog-plugin-auth-httpheaders"
+    "url": "github.com:Graylog2/graylog-plugin-auth-sso"
   },
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server",
