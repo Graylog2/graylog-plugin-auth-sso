@@ -1,6 +1,6 @@
 # SSO Authentication Plugin for Graylog
 
-[![Build Status](https://travis-ci.org/github.com:Graylog2/graylog-plugin-auth-httpheaders.svg?branch=master)](https://travis-ci.org/github.com:Graylog2/graylog-plugin-auth-httpheaders)
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-auth-sso.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-auth-sso)
 
 This plugins adds SSO (Single Sign-On) capabilities to Graylog. It supports automatic login and user account creation based on trusted HTTP headers set by an authentication proxy.
 
@@ -10,7 +10,7 @@ This plugins adds SSO (Single Sign-On) capabilities to Graylog. It supports auto
 Installation
 ------------
 
-[Download the plugin](https://github.com/github.com:Graylog2/graylog-plugin-auth-httpheaders/releases)
+[Download the plugin](https://github.com/Graylog2/graylog-plugin-auth-sso/releases)
 and place the `.jar` file in your Graylog plugin directory. The plugin directory
 is the `plugins/` folder relative from your `graylog-server` directory by default
 and can be configured in your `graylog.conf` file.

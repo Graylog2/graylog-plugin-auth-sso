@@ -24,9 +24,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:github.com:Graylog2/graylog-plugin-auth-sso.git</connection>
-        <developerConnection>scm:git:git@github.com:github.com:Graylog2/graylog-plugin-auth-sso.git</developerConnection>
-        <url>https://github.com/github.com:Graylog2/graylog-plugin-auth-sso</url>
+        <connection>scm:git:git@github.com:Graylog2/graylog-plugin-auth-sso.git</connection>
+        <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-auth-sso.git</developerConnection>
+        <url>https://github.com/Graylog2/graylog-plugin-auth-sso</url>
         <tag>HEAD</tag>
     </scm>
 
