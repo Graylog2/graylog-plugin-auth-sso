@@ -104,17 +104,13 @@ public class SsoAuthRealm extends AuthenticatingRealm {
 
                     // fields based on optional headers
                     final Optional<String> fullnameHeaderOption = headerValue(requestHeaders, config.fullnameHeader());
-                    if (fullnameHeaderOption.isPresent()) {
-                        user.setFullName(fullnameHeaderOption.get());
-                    } else {
-                        user.setFullName(username);
-                    }
+                    user.setFullName(fullnameHeaderOption.orElse(username));
 
                     final Optional<String> emailHeaderOption = headerValue(requestHeaders, config.emailHeader());
                     if (emailHeaderOption.isPresent()) {
                         user.setEmail(emailHeaderOption.get());
                     } else {
-                        user.setEmail(username + "@localhost");
+                        user.setEmail(username + "@" + Optional.ofNullable(config.defaultEmailDomain()).orElse("localhost"));
                     }
 
                     // TODO we currently only support "Reader" and "Admin" here

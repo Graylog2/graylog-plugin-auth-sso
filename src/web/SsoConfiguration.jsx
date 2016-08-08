@@ -97,7 +97,11 @@ const SsoConfiguration = React.createClass({
                        onChange={this._bindValue} disabled={!this.state.config.auto_create_user}/>
                 <Input type="text" id="email_header" name="email_header" labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9" placeholder="Email header" label="Email Header"
-                       value={this.state.config.email_header} help="HTTP header containing the email address of user to create (defaults to 'username@localhost')."
+                       value={this.state.config.email_header} help={"HTTP header containing the email address of user to create (defaults to 'username@" + (this.state.config.default_email_domain || "localhost") + "')."}
+                       onChange={this._bindValue} disabled={!this.state.config.auto_create_user}/>
+                <Input type="text" id="default_email_domain" name="default_email_domain" labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9" placeholder="localhost" label="Email Domain"
+                       value={this.state.config.default_email_domain} help="The default domain to use if there is no email header configured (defaults to 'localhost')."
                        onChange={this._bindValue} disabled={!this.state.config.auto_create_user}/>
                 <Input id="default_group" labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9" label="Default User Role"
