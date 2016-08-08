@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.auth.sso;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -80,21 +81,14 @@ public class SsoAuthRealm extends AuthenticatingRealm {
 
         final Optional<String> userNameOption = headerValue(requestHeaders, usernameHeader);
         if (userNameOption.isPresent()) {
-            final boolean inTrustedSubnets = trustedProxies.stream()
-                    .anyMatch(ipSubnet -> {
-                        try {
-                            return ipSubnet.contains(headersToken.getRemoteAddr());
-                        } catch (UnknownHostException ignored) {
-                            LOG.debug("Looking up remote address {} failed.", headersToken.getRemoteAddr());
-                            return false;
-                        }
-                    });
-            if (config.requireTrustedProxies() && !inTrustedSubnets) {
-                LOG.info("Request with trusted header {} received from {} which is not in the trusted subnets: {}",
-                         usernameHeader,
-                         headersToken.getRemoteAddr(),
-                         Joiner.on(", ").join(trustedProxies));
-                return null;
+            if (config.requireTrustedProxies()) {
+                if (inTrustedSubnets(headersToken.getRemoteAddr())) {
+                    LOG.info("Request with trusted header {} received from {} which is not in the trusted subnets: {}",
+                             usernameHeader,
+                             headersToken.getRemoteAddr(),
+                             Joiner.on(", ").join(trustedProxies));
+                    return null;
+                }
             }
             final String username = userNameOption.get();
             User user = userService.load(username);
@@ -155,6 +149,20 @@ public class SsoAuthRealm extends AuthenticatingRealm {
         }
         LOG.debug("Trusted header {} is not set.", usernameHeader);
         return null;
+    }
+
+    @VisibleForTesting
+    @SuppressWarnings("WeakerAccess")
+    boolean inTrustedSubnets(String remoteAddr) {
+        return !trustedProxies.stream()
+                .anyMatch(ipSubnet -> {
+                    try {
+                        return ipSubnet.contains(remoteAddr);
+                    } catch (UnknownHostException ignored) {
+                        LOG.debug("Looking up remote address {} failed.", remoteAddr);
+                        return false;
+                    }
+                });
     }
 
     private Optional<String> headerValue(MultivaluedMap<String, String> headers, @Nullable String headerName) {

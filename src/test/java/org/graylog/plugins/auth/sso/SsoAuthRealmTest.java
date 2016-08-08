@@ -1,0 +1,69 @@
+package org.graylog.plugins.auth.sso;
+
+import com.google.common.collect.Maps;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.shared.security.HttpHeadersToken;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.RoleService;
+import org.graylog2.users.UserImpl;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.junit.Test;
+
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class SsoAuthRealmTest {
+
+    @Test
+    public void checkSubnetConfig() throws UnknownHostException {
+        Set<IpSubnet> trustedProxies = Collections.singleton(new IpSubnet("192.168.0.0/24"));
+        final ClusterConfigService configService = mock(ClusterConfigService.class);
+
+        when(configService.getOrDefault(any(), any()))
+                .thenReturn(SsoAuthConfig.builder()
+                                    .usernameHeader("X-Remote-User")
+                                    .autoCreateUser(false)
+                                    .emailHeader("")
+                                    .fullnameHeader("")
+                                    .requireTrustedProxies(false)
+                                    .build());
+
+        final UserService userService = mock(UserService.class);
+        when(userService.load(eq("horst"))).thenReturn(new UserImpl(mock(PasswordAlgorithmFactory.class),
+                                                                    mock(Permissions.class),
+                                                                    Maps.newHashMap()));
+        final SsoAuthRealm realm = new SsoAuthRealm(userService,
+                                                    configService,
+                                                    mock(RoleService.class),
+                                                    trustedProxies);
+
+        final MultivaluedStringMap headers = new MultivaluedStringMap();
+        // headers must be lowercase, jersey does this the same way
+        headers.put("x-remote-user", Collections.singletonList("horst"));
+        final HttpHeadersToken headersToken = new HttpHeadersToken(headers, "192.168.0.1", "192.168.0.1");
+        final SsoAuthRealm realmSpy = spy(realm);
+        final AuthenticationInfo info = realmSpy.doGetAuthenticationInfo(headersToken);
+
+        assertThat(info).isNotNull();
+        assertThat(info.getPrincipals().getPrimaryPrincipal()).isNotNull();
+
+        verify(userService).load(eq("horst"));
+        verify(realmSpy, never()).inTrustedSubnets(anyString());
+    }
+
+}
