@@ -68,6 +68,10 @@ public abstract class SsoAuthConfig {
     @Nullable
     public abstract String trustedProxies();
 
+    @JsonProperty("default_email_domain")
+    @Nullable
+    public abstract String defaultEmailDomain();
+
     @AutoValue.Builder
     public static abstract class Builder {
         abstract SsoAuthConfig build();
@@ -92,6 +96,9 @@ public abstract class SsoAuthConfig {
 
         @JsonProperty("trusted_proxies")
         public abstract Builder trustedProxies(@Nullable String trustedProxies);
+
+        @JsonProperty("default_email_domain")
+        public abstract Builder defaultEmailDomain(@Nullable String defaultEmailDomain);
 
     }
 }

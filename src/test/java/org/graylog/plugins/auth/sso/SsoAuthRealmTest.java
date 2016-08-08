@@ -1,10 +1,12 @@
 package org.graylog.plugins.auth.sso;
 
+
 import com.google.common.collect.Maps;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -66,4 +68,86 @@ public class SsoAuthRealmTest {
         verify(realmSpy, never()).inTrustedSubnets(anyString());
     }
 
+    @Test
+    public void testDefaultDomain() {
+
+        final ClusterConfigService configService = mock(ClusterConfigService.class);
+
+        when(configService.getOrDefault(any(), any()))
+                .thenReturn(SsoAuthConfig.builder()
+                                    .usernameHeader("X-Remote-User")
+                                    .autoCreateUser(true)
+                                    .emailHeader(null)
+                                    .fullnameHeader(null)
+                                    .requireTrustedProxies(false)
+                                    .defaultEmailDomain("domain.de")
+                                    .build());
+
+        final UserService userService = mock(UserService.class);
+        final UserImpl user = new UserImpl(
+                new PasswordAlgorithmFactory(Collections.emptyMap(),
+                                             new SHA1HashPasswordAlgorithm("1234567890")),
+                mock(Permissions.class),
+                Maps.newHashMap());
+        when(userService.create()).thenReturn(user);
+
+        final RoleService roleService = mock(RoleService.class);
+        when(roleService.getReaderRoleObjectId()).thenReturn("57a1d276227c473674e1d997");
+        final SsoAuthRealm realm = new SsoAuthRealm(userService,
+                                                    configService,
+                                                    roleService,
+                                                    Collections.emptySet());
+
+        final MultivaluedStringMap headers = new MultivaluedStringMap();
+        // headers must be lowercase, jersey does this the same way
+        headers.put("x-remote-user", Collections.singletonList("horst"));
+        final HttpHeadersToken headersToken = new HttpHeadersToken(headers, "192.168.0.1", "192.168.0.1");
+        final SsoAuthRealm realmSpy = spy(realm);
+        final AuthenticationInfo info = realmSpy.doGetAuthenticationInfo(headersToken);
+
+        assertThat(info).isNotNull();
+        verify(userService).create();
+        assertThat(user.getEmail()).isEqualTo("horst@domain.de");
+    }
+
+    @Test
+    public void testDefaultDomainNotSet() {
+
+        final ClusterConfigService configService = mock(ClusterConfigService.class);
+
+        when(configService.getOrDefault(any(), any()))
+                .thenReturn(SsoAuthConfig.builder()
+                                    .usernameHeader("X-Remote-User")
+                                    .autoCreateUser(true)
+                                    .emailHeader(null)
+                                    .fullnameHeader(null)
+                                    .requireTrustedProxies(false)
+                                    .build());
+
+        final UserService userService = mock(UserService.class);
+        final UserImpl user = new UserImpl(
+                new PasswordAlgorithmFactory(Collections.emptyMap(),
+                                             new SHA1HashPasswordAlgorithm("1234567890")),
+                mock(Permissions.class),
+                Maps.newHashMap());
+        when(userService.create()).thenReturn(user);
+
+        final RoleService roleService = mock(RoleService.class);
+        when(roleService.getReaderRoleObjectId()).thenReturn("57a1d276227c473674e1d997");
+        final SsoAuthRealm realm = new SsoAuthRealm(userService,
+                                                    configService,
+                                                    roleService,
+                                                    Collections.emptySet());
+
+        final MultivaluedStringMap headers = new MultivaluedStringMap();
+        // headers must be lowercase, jersey does this the same way
+        headers.put("x-remote-user", Collections.singletonList("horst"));
+        final HttpHeadersToken headersToken = new HttpHeadersToken(headers, "192.168.0.1", "192.168.0.1");
+        final SsoAuthRealm realmSpy = spy(realm);
+        final AuthenticationInfo info = realmSpy.doGetAuthenticationInfo(headersToken);
+
+        assertThat(info).isNotNull();
+        verify(userService).create();
+        assertThat(user.getEmail()).isEqualTo("horst@localhost");
+    }
 }
