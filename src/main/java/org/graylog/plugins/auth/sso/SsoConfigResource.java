@@ -22,6 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.auth.sso.audit.SsoAuthAuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -67,6 +69,7 @@ public class SsoConfigResource extends RestResource implements PluginRestResourc
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
     @RequiresPermissions(SsoAuthPermissions.CONFIG_UPDATE)
+    @AuditEvent(type = SsoAuthAuditEventTypes.CONFIG_UPDATE)
     public SsoAuthConfig update(@ApiParam(name = "config", required = true) @NotNull SsoAuthConfig config) {
         // we do not want to store trustedProxies in the cluster config because it is not editable in the UI
         final SsoAuthConfig cleanConfig = config.toBuilder().trustedProxies(null).build();

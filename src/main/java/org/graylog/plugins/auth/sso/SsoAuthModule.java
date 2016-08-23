@@ -17,6 +17,7 @@
 package org.graylog.plugins.auth.sso;
 
 import com.google.inject.Scopes;
+import org.graylog.plugins.auth.sso.audit.SsoAuthAuditEventTypes;
 import org.graylog2.plugin.PluginModule;
 
 /**
@@ -29,5 +30,6 @@ public class SsoAuthModule extends PluginModule {
         authenticationRealmBinder().addBinding(SsoAuthRealm.NAME).to(SsoAuthRealm.class).in(Scopes.SINGLETON);
         addRestResource(SsoConfigResource.class);
         addPermissions(SsoAuthPermissions.class);
+        addAuditEventTypes(SsoAuthAuditEventTypes.class);
     }
 }
