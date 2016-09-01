@@ -8,10 +8,12 @@ addons:
     packages:
       - rpm
 install:
-  - git clone https://github.com/Graylog2/graylog2-server ../graylog2-server
+  - git clone --depth=1 --branch master https://github.com/Graylog2/graylog2-server ../graylog2-server
+  - cd ../graylog2-server && mvn frontend:npm
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dskip.web.build=true -B -V
 script:
   - mvn test -B
+  - find target/ -name '*.jar'
 before_deploy:
   - mvn jdeb:jdeb && export RELEASE_DEB_FILE=$(ls target/*.deb)
   - mvn rpm:rpm && export RELEASE_RPM_FILE=$(find target/ -name '*.rpm' | tail -1)
