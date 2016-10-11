@@ -5,7 +5,7 @@
 This plugins adds SSO (Single Sign-On) capabilities to Graylog. It supports automatic login and user account creation based on trusted HTTP headers set by an authentication proxy.
 
 
-**Required Graylog version:** 2.1.0 and later
+**Required Graylog version:** 2.2.0 and later
 
 Installation
 ------------
