@@ -113,12 +113,19 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                         user.setEmail(username + "@" + Optional.ofNullable(config.defaultEmailDomain()).orElse("localhost"));
                     }
 
-                    // TODO we currently only support "Reader" and "Admin" here
                     final String defaultGroup = config.defaultGroup();
                     if (defaultGroup != null) {
-                        if (defaultGroup.equalsIgnoreCase("admin")) {
-                            user.setRoleIds(Collections.singleton(roleService.getAdminRoleObjectId()));
-                        } else {
+                        try {
+                            Role role = roleService.loadAllLowercaseNameMap().get(defaultGroup.toLowerCase());
+                            if (role != null) {
+                                user.setRoleIds(Collections.singleton(roleService.getAdminRoleObjectId()));
+                            } else {
+                                LOG.warn("Could not find group named {}, giving user reader role instead", defaultGroup);
+                                user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
+                            }
+                        }
+                        catch (NotFoundException e) {
+                            LOG.info("Unable to retrieve roles, giving user reader role");
                             user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
                         }
                     } else {
