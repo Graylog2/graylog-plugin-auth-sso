@@ -118,7 +118,7 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                         try {
                             Role role = roleService.loadAllLowercaseNameMap().get(defaultGroup.toLowerCase());
                             if (role != null) {
-                                user.setRoleIds(Collections.singleton(roleService.getAdminRoleObjectId()));
+                                user.setRoleIds(Collections.singleton(role.getId()));
                             } else {
                                 LOG.warn("Could not find group named {}, giving user reader role instead", defaultGroup);
                                 user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
