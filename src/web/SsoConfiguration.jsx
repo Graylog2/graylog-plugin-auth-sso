@@ -5,8 +5,7 @@ import { Row, Col, Input, Button, Alert } from "react-bootstrap";
 import SsoAuthActions from "SsoAuthActions";
 import SsoAuthStore from "SsoAuthStore";
 
-import Spinner from "components/common/Spinner";
-import PageHeader from "components/common/PageHeader";
+import { PageHeader, Spinner } from "components/common";
 import ObjectUtils from 'util/ObjectUtils';
 
 const SsoConfiguration = React.createClass({
