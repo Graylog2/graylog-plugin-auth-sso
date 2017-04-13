@@ -24,11 +24,13 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.ShiroSecurityContext;
+import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
@@ -40,9 +42,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SsoAuthRealm extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SsoAuthRealm.class);
@@ -140,11 +146,58 @@ public class SsoAuthRealm extends AuthenticatingRealm {
             }
             LOG.trace("Trusted header {} set, continuing with user name {}", usernameHeader, user.getName());
 
+            if (config.syncRoles()) {
+                Optional<List<String>> rolesList = headerValues(requestHeaders, config.rolesHeader());
+                if (rolesList.isPresent()) {
+                    try {
+                        syncUserRoles(rolesList.get(), user);
+                    } catch (ValidationException e) {
+                        LOG.error(
+                                "Unable to sync roles [{}] of user {} from http header. Not logging in with http header.",
+                                rolesList.get(), user, e);
+                        return null;
+                    }
+                }
+            }
+
             ShiroSecurityContext.requestSessionCreation(true);
             return new SimpleAccount(user.getName(), null, NAME);
         }
         LOG.debug("Trusted header {} is not set.", usernameHeader);
         return null;
+    }
+
+    protected Set<String> csv(List<String> values) {
+        Set<String> uniqValues = new HashSet<>();
+        for (String csString : values) {
+            String[] valueArr = csString.split(",");
+
+            for (String value : valueArr) {
+                uniqValues.add(value.trim());
+            }
+        }
+        return uniqValues;
+    }
+
+    protected void syncUserRoles(List<String> roleCsv, User user) throws ValidationException {
+        Set<String> roleNames = csv(roleCsv);
+        Set<String> existingRoles = user.getRoleIds();
+
+        Set<String> syncedRoles = new HashSet<>();
+        for (String roleName : roleNames) {
+            if (roleService.exists(roleName)) {
+                try {
+                    Role r = roleService.load(roleName);
+                    syncedRoles.add(r.getId());
+                } catch (NotFoundException e) {
+                    LOG.error("Role {} not found, but it existed before", roleName);
+                }
+            }
+        }
+        if (existingRoles != null && !existingRoles.equals(syncedRoles)) {
+            user.setRoleIds(syncedRoles);
+            userService.save(user);
+        }
     }
 
     @VisibleForTesting
@@ -168,4 +221,15 @@ public class SsoAuthRealm extends AuthenticatingRealm {
         return Optional.ofNullable(headers.getFirst(headerName.toLowerCase()));
     }
 
+    protected Optional<List<String>> headerValues(MultivaluedMap<String, String> headers,
+            @Nullable String headerNamePrefix) {
+        if (headerNamePrefix == null) {
+            return Optional.empty();
+        }
+        Set<String> keys = headers.keySet();
+        List<String> headerValues = keys.stream().filter(key -> key.startsWith(headerNamePrefix.toLowerCase()))
+                .map(key -> headers.getFirst(key)).collect(Collectors.toList());
+
+        return Optional.ofNullable(headerValues);
+    }
 }

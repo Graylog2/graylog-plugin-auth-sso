@@ -21,21 +21,33 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.RoleImpl;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserImpl;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,6 +71,8 @@ public class SsoAuthRealmTest {
                                     .emailHeader("")
                                     .fullnameHeader("")
                                     .requireTrustedProxies(false)
+                                    .syncRoles(false)
+                                    .rolesHeader("Roles")
                                     .build());
 
         final UserService userService = mock(UserService.class);
@@ -97,6 +111,8 @@ public class SsoAuthRealmTest {
                                     .fullnameHeader(null)
                                     .requireTrustedProxies(false)
                                     .defaultEmailDomain("domain.de")
+                                    .syncRoles(false)
+                                    .rolesHeader("Roles")
                                     .build());
 
         final UserService userService = mock(UserService.class);
@@ -138,6 +154,8 @@ public class SsoAuthRealmTest {
                                     .emailHeader(null)
                                     .fullnameHeader(null)
                                     .requireTrustedProxies(false)
+                                    .syncRoles(false)
+                                    .rolesHeader("Roles")
                                     .build());
 
         final UserService userService = mock(UserService.class);
@@ -165,5 +183,81 @@ public class SsoAuthRealmTest {
         assertThat(info).isNotNull();
         verify(userService).create();
         assertThat(user.getEmail()).isEqualTo("horst@localhost");
+    }
+    
+    @Test
+    public void testHeaderValuesCsv() {
+        MultivaluedHashMap<String, String> m = new MultivaluedHashMap<>();
+        m.put("roles", Arrays.asList(new String[]{"role1, role2, role3"}));
+        m.put("roles_1", Arrays.asList(new String[]{"asdf1"}));
+        m.put("roles_2", Arrays.asList(new String[]{"asdf2"}));
+        
+        SsoAuthRealm r = new SsoAuthRealm(null, null, null, null);
+        Optional<List<String>> s = r.headerValues(m, "Roles");
+        Set<String> actual = r.csv(s.get());
+        List<String> expected = Arrays.asList(new String[]{"role1","role2","role3","asdf1","asdf2"});
+        
+        assertEquals(actual.size(), expected.size());
+        for ( String role : expected) {
+            if ( !actual.contains(role)) {
+                fail("Role [" + role + "] expected, but not in result: " + actual);
+            }
+        }
+        
+    }
+    
+    @Test
+    public void testSyncRoles() throws Exception {
+        List<String> rolesCsv = Arrays.asList(new String[]{"role1","role2", "role3, role4"});
+        
+        User u = Mockito.spy(User.class);
+        Set<String> existingRoles = new HashSet<>();
+        
+        when(u.getRoleIds()).thenReturn(existingRoles);
+        
+        RoleService roleService = mock(RoleService.class);
+        UserService userService = mock(UserService.class);
+        
+        
+        when(roleService.exists(anyString())).thenReturn(true);
+        RoleImpl role1 = new RoleImpl();
+        role1._id = "1";
+        role1.name = "role1";
+        
+        when(roleService.load("role1")).thenReturn(role1);
+        
+        RoleImpl role2 = new RoleImpl();
+        role2._id = "2";
+        role2.name = "role2";
+        
+        when(roleService.load("role2")).thenReturn(role2);
+        
+        RoleImpl role3 = new RoleImpl();
+        role3._id = "3";
+        role3.name = "role3";
+        
+        when(roleService.load("role3")).thenReturn(role3);
+        RoleImpl role4 = new RoleImpl();
+        role4._id = "4";
+        role4.name = "role4";
+        
+        when(roleService.load("role4")).thenReturn(role4);
+        
+        Set<String> syncRoles = new HashSet<>();
+        syncRoles.add(role1._id);
+        syncRoles.add(role2._id);
+        syncRoles.add(role3._id);
+        syncRoles.add(role4._id);
+        
+        Mockito.doNothing().when(u).setRoleIds(syncRoles);
+        
+        when(userService.save(u)).thenReturn("user");
+        
+        SsoAuthRealm r = new SsoAuthRealm(userService, null, roleService, null);
+        r.syncUserRoles(rolesCsv, u);
+        
+        verify(u).getRoleIds();
+        verify(u).setRoleIds(syncRoles);
+        verify(userService).save(u);
     }
 }
