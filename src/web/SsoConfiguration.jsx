@@ -124,6 +124,19 @@ const SsoConfiguration = React.createClass({
                 </Input>
               </fieldset>
               <fieldset>
+                <legend className="col-sm-12">Role synchronization</legend>
+                <Input type="checkbox" label="Synchronize the roles of the user from the specified HTTP header"
+                       help="Enable this if Graylog should automatically synchronize the roles of the user, with that specified in the http header. Only existing roles in Graylog will be added to the user."
+                       wrapperClassName="col-sm-offset-3 col-sm-9"
+                       name="sync_roles"
+                       checked={this.state.config.sync_roles}
+                       onChange={this._bindChecked}/>
+                <Input type="text" id="roles_header" name="roles_header" labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9" placeholder="Roles header" label="Roles Header"
+                       value={this.state.config.roles_header} help="Prefix of the HTTP header, can contain a comma-separated list of roles in one header, otherwise all headers with that prefix will be recognized."
+                       onChange={this._bindValue} disabled={!this.state.config.sync_roles}/>
+              </fieldset>
+              <fieldset>
                 <legend className="col-sm-12">Store settings</legend>
                 <div className="form-group">
                   <Col sm={9} smOffset={3}>
