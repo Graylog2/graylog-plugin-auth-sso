@@ -1,7 +1,9 @@
 import React from "react";
 import Reflux from "reflux";
-import { Row, Col, Input, Button, Alert } from "react-bootstrap";
+import { Row, Col, Button, Alert } from "react-bootstrap";
+import { Input } from 'components/bootstrap';
 
+import { PageHeader, Spinner } from "components/common";
 import SsoAuthActions from "SsoAuthActions";
 import SsoAuthStore from "SsoAuthStore";
 
@@ -48,7 +50,7 @@ const SsoConfiguration = React.createClass({
 
   render() {
     let content;
-    if (!this.state.config) {
+    if (!this.state.config || !this.state.roles) {
       content = <Spinner />;
     } else {
       let trustedProxies = null;
@@ -67,7 +69,7 @@ const SsoConfiguration = React.createClass({
         <br/>
         {trustedProxies}
       </span>);
-      const groups = this.state.roles.map(function(role) { return <option key={"default-group-" + role} value={role}>{role}</option>; })
+      const roles = this.state.roles.map((role) => <option key={"default-group-" + role} value={role}>{role}</option>);
       content = (
         <Row>
           <Col lg={8}>
@@ -114,9 +116,9 @@ const SsoConfiguration = React.createClass({
                   <Row>
                     <Col sm={6}>
                       <select id="default_group" name="default_group" className="form-control" required
-                              value={this.state.config.default_group}
+                              value={this.state.config.default_group || 'Reader'}
                               onChange={this._bindValue} disabled={!this.state.config.auto_create_user}>
-                              {groups}
+                              {roles}
                       </select>
                     </Col>
                   </Row>
