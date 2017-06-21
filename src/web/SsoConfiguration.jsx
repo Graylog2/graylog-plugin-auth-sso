@@ -5,6 +5,9 @@ import { Row, Col, Input, Button, Alert } from "react-bootstrap";
 import SsoAuthActions from "SsoAuthActions";
 import SsoAuthStore from "SsoAuthStore";
 
+import StoreProvider from 'injection/StoreProvider';
+const RolesStore = StoreProvider.getStore('Roles')
+
 import { PageHeader, Spinner } from "components/common";
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -15,6 +18,9 @@ const SsoConfiguration = React.createClass({
 
   componentDidMount() {
     SsoAuthActions.config();
+    RolesStore.loadRoles().done(roles => {
+      this.setState({ roles: roles.map(role => role.name) });
+    });
   },
 
   _saveSettings(ev) {
@@ -31,7 +37,6 @@ const SsoConfiguration = React.createClass({
     newState.config = settings;
     this.setState(newState);
   },
-
 
   _bindChecked(ev, value) {
     this._setSetting(ev.target.name, typeof value === 'undefined' ? ev.target.checked : value);
@@ -62,6 +67,7 @@ const SsoConfiguration = React.createClass({
         <br/>
         {trustedProxies}
       </span>);
+      const groups = this.state.roles.map(function(role) { return <option key={"default-group-" + role} value={role}>{role}</option>; })
       content = (
         <Row>
           <Col lg={8}>
@@ -110,9 +116,7 @@ const SsoConfiguration = React.createClass({
                       <select id="default_group" name="default_group" className="form-control" required
                               value={this.state.config.default_group}
                               onChange={this._bindValue} disabled={!this.state.config.auto_create_user}>
-
-                        <option value="Reader">Reader - basic access</option>
-                        <option value="Admin">Administrator - complete access</option>
+                              {groups}
                       </select>
                     </Col>
                   </Row>

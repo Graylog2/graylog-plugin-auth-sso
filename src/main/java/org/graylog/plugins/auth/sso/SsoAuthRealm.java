@@ -24,11 +24,13 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.ShiroSecurityContext;
+import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
@@ -113,12 +115,19 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                         user.setEmail(username + "@" + Optional.ofNullable(config.defaultEmailDomain()).orElse("localhost"));
                     }
 
-                    // TODO we currently only support "Reader" and "Admin" here
                     final String defaultGroup = config.defaultGroup();
                     if (defaultGroup != null) {
-                        if (defaultGroup.equalsIgnoreCase("admin")) {
-                            user.setRoleIds(Collections.singleton(roleService.getAdminRoleObjectId()));
-                        } else {
+                        try {
+                            Role role = roleService.loadAllLowercaseNameMap().get(defaultGroup.toLowerCase());
+                            if (role != null) {
+                                user.setRoleIds(Collections.singleton(role.getId()));
+                            } else {
+                                LOG.warn("Could not find group named {}, giving user reader role instead", defaultGroup);
+                                user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
+                            }
+                        }
+                        catch (NotFoundException e) {
+                            LOG.info("Unable to retrieve roles, giving user reader role");
                             user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
                         }
                     } else {
