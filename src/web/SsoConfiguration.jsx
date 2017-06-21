@@ -10,7 +10,6 @@ import SsoAuthStore from "SsoAuthStore";
 import StoreProvider from 'injection/StoreProvider';
 const RolesStore = StoreProvider.getStore('Roles')
 
-import { PageHeader, Spinner } from "components/common";
 import ObjectUtils from 'util/ObjectUtils';
 
 const SsoConfiguration = React.createClass({
