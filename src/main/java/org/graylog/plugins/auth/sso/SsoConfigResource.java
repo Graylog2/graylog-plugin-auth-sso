@@ -27,7 +27,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
