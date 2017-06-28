@@ -33,7 +33,7 @@ import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,12 +119,19 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                         user.setEmail(username + "@" + Optional.ofNullable(config.defaultEmailDomain()).orElse("localhost"));
                     }
 
-                    // TODO we currently only support "Reader" and "Admin" here
                     final String defaultGroup = config.defaultGroup();
                     if (defaultGroup != null) {
-                        if (defaultGroup.equalsIgnoreCase("admin")) {
-                            user.setRoleIds(Collections.singleton(roleService.getAdminRoleObjectId()));
-                        } else {
+                        try {
+                            Role role = roleService.loadAllLowercaseNameMap().get(defaultGroup.toLowerCase());
+                            if (role != null) {
+                                user.setRoleIds(Collections.singleton(role.getId()));
+                            } else {
+                                LOG.warn("Could not find group named {}, giving user reader role instead", defaultGroup);
+                                user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
+                            }
+                        }
+                        catch (NotFoundException e) {
+                            LOG.info("Unable to retrieve roles, giving user reader role");
                             user.setRoleIds(Collections.singleton(roleService.getReaderRoleObjectId()));
                         }
                     } else {

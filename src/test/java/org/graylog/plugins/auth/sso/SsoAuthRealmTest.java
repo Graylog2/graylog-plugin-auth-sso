@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.auth.sso;
 
-
 import com.google.common.collect.Maps;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
@@ -30,8 +29,7 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleImpl;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserImpl;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
-import org.junit.Ignore;
+import org.graylog2.utilities.IpSubnet;
 import org.junit.Test;
 import org.mockito.Mockito;
 

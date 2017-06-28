@@ -1,11 +1,15 @@
 import React from "react";
 import Reflux from "reflux";
-import { Row, Col, Input, Button, Alert } from "react-bootstrap";
+import { Row, Col, Button, Alert } from "react-bootstrap";
+import { Input } from 'components/bootstrap';
 
+import { PageHeader, Spinner } from "components/common";
 import SsoAuthActions from "SsoAuthActions";
 import SsoAuthStore from "SsoAuthStore";
 
-import { PageHeader, Spinner } from "components/common";
+import StoreProvider from 'injection/StoreProvider';
+const RolesStore = StoreProvider.getStore('Roles')
+
 import ObjectUtils from 'util/ObjectUtils';
 
 const SsoConfiguration = React.createClass({
@@ -15,6 +19,9 @@ const SsoConfiguration = React.createClass({
 
   componentDidMount() {
     SsoAuthActions.config();
+    RolesStore.loadRoles().done(roles => {
+      this.setState({ roles: roles.map(role => role.name) });
+    });
   },
 
   _saveSettings(ev) {
@@ -32,7 +39,6 @@ const SsoConfiguration = React.createClass({
     this.setState(newState);
   },
 
-
   _bindChecked(ev, value) {
     this._setSetting(ev.target.name, typeof value === 'undefined' ? ev.target.checked : value);
   },
@@ -43,7 +49,7 @@ const SsoConfiguration = React.createClass({
 
   render() {
     let content;
-    if (!this.state.config) {
+    if (!this.state.config || !this.state.roles) {
       content = <Spinner />;
     } else {
       let trustedProxies = null;
@@ -62,6 +68,7 @@ const SsoConfiguration = React.createClass({
         <br/>
         {trustedProxies}
       </span>);
+      const roles = this.state.roles.map((role) => <option key={"default-group-" + role} value={role}>{role}</option>);
       content = (
         <Row>
           <Col lg={8}>
@@ -108,11 +115,9 @@ const SsoConfiguration = React.createClass({
                   <Row>
                     <Col sm={6}>
                       <select id="default_group" name="default_group" className="form-control" required
-                              value={this.state.config.default_group}
+                              value={this.state.config.default_group || 'Reader'}
                               onChange={this._bindValue} disabled={!this.state.config.auto_create_user}>
-
-                        <option value="Reader">Reader - basic access</option>
-                        <option value="Admin">Administrator - complete access</option>
+                              {roles}
                       </select>
                     </Col>
                   </Row>
