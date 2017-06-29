@@ -7,6 +7,14 @@ This plugins adds SSO (Single Sign-On) capabilities to Graylog. It supports auto
 
 **Required Graylog version:** 2.2.0 and later
 
+Version Compatibility
+---------------------
+
+| Plugin Version | Graylog Version |
+| -------------- | --------------- |
+| 2.3.x          | 2.3.x           |
+| 1.0.x          | >=2.1.x, <2.3.x |
+
 Installation
 ------------
 
