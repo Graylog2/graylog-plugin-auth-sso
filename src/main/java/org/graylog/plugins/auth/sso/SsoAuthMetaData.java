@@ -28,6 +28,8 @@ import java.util.Set;
  * Implement the PluginMetaData interface here.
  */
 public class SsoAuthMetaData implements PluginMetaData {
+    private static final String PLUGIN_PROPERTIES = "org.graylog.plugins.graylog-plugin-auth-sso/graylog-plugin.properties";
+
     @Override
     public String getUniqueId() {
         return "org.graylog.plugins.auth.sso.SsoAuthPlugin";
@@ -50,7 +52,7 @@ public class SsoAuthMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return Version.from(1, 0, 0);
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "version", Version.from(0, 0, 0, "unknown"));
     }
 
     @Override
@@ -60,7 +62,7 @@ public class SsoAuthMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return Version.from(2, 1, 0);
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "graylog.version", Version.CURRENT_CLASSPATH);
     }
 
     @Override
