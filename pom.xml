@@ -9,7 +9,7 @@
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-web-parent</artifactId>
         <version>2.3.0-beta.2-SNAPSHOT</version>
-        <relativePath>../graylog2-server/graylog-plugin-web-parent</relativePath>
+        <relativePath>../graylog2-server/graylog-plugin-parent/graylog-plugin-web-parent</relativePath>
     </parent>
 
     <artifactId>graylog-plugin-auth-sso</artifactId>
