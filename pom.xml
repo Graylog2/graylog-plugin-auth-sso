@@ -34,11 +34,22 @@
         <tag>HEAD</tag>
     </scm>
 
+    <properties>
+        <graylog.version>2.3.0-beta.2-SNAPSHOT</graylog.version>
+    </properties>
+
     <dependencies>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-server</artifactId>
+            <version>${graylog.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value</artifactId>
             <version>${auto-value.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -66,9 +77,7 @@
             <resource><directory>build</directory></resource>
             <resource>
               <directory>src/main/resources</directory>
-              <excludes>
-                <exclude>**/*.properties</exclude>
-              </excludes>
+              <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
