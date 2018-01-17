@@ -22,6 +22,7 @@ import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -67,6 +68,7 @@ public class SsoAuthRealmTest {
         final SsoAuthRealm realm = new SsoAuthRealm(userService,
                                                     configService,
                                                     mock(RoleService.class),
+                                                    mock(LdapUserAuthenticator.class),
                                                     trustedProxies);
 
         final MultivaluedStringMap headers = new MultivaluedStringMap();
@@ -111,6 +113,7 @@ public class SsoAuthRealmTest {
         final SsoAuthRealm realm = new SsoAuthRealm(userService,
                                                     configService,
                                                     roleService,
+                                                    mock(LdapUserAuthenticator.class),
                                                     Collections.emptySet());
 
         final MultivaluedStringMap headers = new MultivaluedStringMap();
@@ -152,6 +155,7 @@ public class SsoAuthRealmTest {
         final SsoAuthRealm realm = new SsoAuthRealm(userService,
                                                     configService,
                                                     roleService,
+                                                    mock(LdapUserAuthenticator.class),
                                                     Collections.emptySet());
 
         final MultivaluedStringMap headers = new MultivaluedStringMap();

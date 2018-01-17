@@ -28,6 +28,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.security.HttpHeadersToken;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.Role;
@@ -51,6 +52,8 @@ public class SsoAuthRealm extends AuthenticatingRealm {
 
     public static final String NAME = "sso";
 
+    private final LdapUserAuthenticator ldapAuthenticator;
+
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
     private final RoleService roleService;
@@ -60,11 +63,13 @@ public class SsoAuthRealm extends AuthenticatingRealm {
     public SsoAuthRealm(UserService userService,
                         ClusterConfigService clusterConfigService,
                         RoleService roleService,
+                        LdapUserAuthenticator ldapAuthenticator,
                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
         this.roleService = roleService;
         this.trustedProxies = trustedProxies;
+        this.ldapAuthenticator = ldapAuthenticator;
         setAuthenticationTokenClass(HttpHeadersToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
         setCachingEnabled(false);
@@ -93,7 +98,16 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                 }
             }
             final String username = userNameOption.get();
-            User user = userService.load(username);
+            User user = null;
+
+            if (ldapAuthenticator.isEnabled()) {
+                user = ldapAuthenticator.syncLdapUser(username);
+            }
+
+            if (user == null) {
+                user = userService.load(username);
+            }
+
             if (user == null) {
                 if (config.autoCreateUser()) {
                     user = userService.create();
