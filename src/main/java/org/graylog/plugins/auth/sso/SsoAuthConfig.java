@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_SsoAuthConfig.Builder.class)
@@ -83,7 +84,17 @@ public abstract class SsoAuthConfig {
     
     @AutoValue.Builder
     public static abstract class Builder {
-        abstract SsoAuthConfig build();
+        abstract SsoAuthConfig autoBuild();
+
+        public SsoAuthConfig build() {
+            if (!syncRoles().isPresent()) {
+                // take the default values, so we can show them in the UI without having to do a migration
+                final SsoAuthConfig defaultConfig = defaultConfig(null);
+                syncRoles(defaultConfig.syncRoles());
+                rolesHeader(defaultConfig.rolesHeader());
+            }
+            return autoBuild();
+        }
 
         @JsonProperty("username_header")
         public abstract Builder usernameHeader(String usernameHeader);
@@ -111,7 +122,8 @@ public abstract class SsoAuthConfig {
         
         @JsonProperty("sync_roles")
         public abstract Builder syncRoles(boolean syncRoles);
-        
+        abstract Optional<Boolean> syncRoles();
+
         @JsonProperty("roles_header")
         public abstract Builder rolesHeader(@Nullable String rolesHeader);
 
