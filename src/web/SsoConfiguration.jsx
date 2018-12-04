@@ -126,7 +126,7 @@ const SsoConfiguration = React.createClass({
               <fieldset>
                 <legend className="col-sm-12">Role synchronization</legend>
                 <Input type="checkbox" label="Synchronize the roles of the user from the specified HTTP header"
-                       help="Enable this if Graylog should automatically synchronize the roles of the user, with that specified in the http header. Only existing roles in Graylog will be added to the user."
+                       help="Enable this if Graylog should automatically synchronize the roles of the user, with that specified in the HTTP header. Only existing roles in Graylog will be added to the user."
                        wrapperClassName="col-sm-offset-3 col-sm-9"
                        name="sync_roles"
                        checked={this.state.config.sync_roles}
