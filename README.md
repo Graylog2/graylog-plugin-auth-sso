@@ -17,15 +17,6 @@ Version Compatibility
 | 2.3.x          | 2.3.x           |
 | 1.0.x          | >=2.1.x, <2.3.x |
 
-Version Compatibility
----------------------
-
-| Plugin Version | Graylog Version |
-| -------------- | --------------- |
-| 2.4.x          | 2.4.x           |
-| 2.3.x          | 2.3.x           |
-| 1.0.x          | >=2.1.x, <2.3.x |
-
 Installation
 ------------
 
