@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_SsoAuthConfig.Builder.class)
@@ -40,6 +41,8 @@ public abstract class SsoAuthConfig {
                 .autoCreateUser(true)
                 .requireTrustedProxies(true)
                 .trustedProxies(trustedProxies)
+                .rolesHeader("Roles")
+                .syncRoles(false)
                 .build();
     }
 
@@ -71,10 +74,27 @@ public abstract class SsoAuthConfig {
     @JsonProperty("default_email_domain")
     @Nullable
     public abstract String defaultEmailDomain();
+    
+    @JsonProperty("sync_roles")
+    public abstract boolean syncRoles();
 
+    @JsonProperty("roles_header")
+    @Nullable
+    public abstract String rolesHeader();
+    
     @AutoValue.Builder
     public static abstract class Builder {
-        abstract SsoAuthConfig build();
+        abstract SsoAuthConfig autoBuild();
+
+        public SsoAuthConfig build() {
+            if (!syncRoles().isPresent()) {
+                // take the default values, so we can show them in the UI without having to do a migration
+                final SsoAuthConfig defaultConfig = defaultConfig(null);
+                syncRoles(defaultConfig.syncRoles());
+                rolesHeader(defaultConfig.rolesHeader());
+            }
+            return autoBuild();
+        }
 
         @JsonProperty("username_header")
         public abstract Builder usernameHeader(String usernameHeader);
@@ -99,6 +119,14 @@ public abstract class SsoAuthConfig {
 
         @JsonProperty("default_email_domain")
         public abstract Builder defaultEmailDomain(@Nullable String defaultEmailDomain);
+        
+        @JsonProperty("sync_roles")
+        public abstract Builder syncRoles(boolean syncRoles);
+        abstract Optional<Boolean> syncRoles();
+
+        @JsonProperty("roles_header")
+        public abstract Builder rolesHeader(@Nullable String rolesHeader);
+
 
     }
 }
