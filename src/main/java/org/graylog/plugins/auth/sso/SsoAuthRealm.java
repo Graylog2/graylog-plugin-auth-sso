@@ -38,17 +38,16 @@ import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static org.graylog.plugins.auth.sso.HeaderRoleUtil.*;
 
 public class SsoAuthRealm extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SsoAuthRealm.class);
@@ -187,34 +186,13 @@ public class SsoAuthRealm extends AuthenticatingRealm {
         return null;
     }
 
-    protected Set<String> csv(List<String> values) {
-        Set<String> uniqValues = new HashSet<>();
-        for (String csString : values) {
-            String[] valueArr = csString.split(",");
-
-            for (String value : valueArr) {
-                uniqValues.add(value.trim());
-            }
-        }
-        return uniqValues;
-    }
-
     protected void syncUserRoles(List<String> roleCsv, User user) throws ValidationException {
         Set<String> roleNames = csv(roleCsv);
         Set<String> existingRoles = user.getRoleIds();
 
-        Set<String> syncedRoles = new HashSet<>();
-        for (String roleName : roleNames) {
-            if (roleService.exists(roleName)) {
-                try {
-                    Role r = roleService.load(roleName);
-                    syncedRoles.add(r.getId());
-                } catch (NotFoundException e) {
-                    LOG.error("Role {} not found, but it existed before", roleName);
-                }
-            }
-        }
-        if (existingRoles != null && !existingRoles.equals(syncedRoles)) {
+        Set<String> syncedRoles = getRoleIds(roleService, roleNames);
+
+        if (!existingRoles.equals(syncedRoles)) {
             user.setRoleIds(syncedRoles);
             userService.save(user);
         }
@@ -234,22 +212,4 @@ public class SsoAuthRealm extends AuthenticatingRealm {
                 });
     }
 
-    private Optional<String> headerValue(MultivaluedMap<String, String> headers, @Nullable String headerName) {
-        if (headerName == null) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(headers.getFirst(headerName.toLowerCase()));
-    }
-
-    protected Optional<List<String>> headerValues(MultivaluedMap<String, String> headers,
-            @Nullable String headerNamePrefix) {
-        if (headerNamePrefix == null) {
-            return Optional.empty();
-        }
-        Set<String> keys = headers.keySet();
-        List<String> headerValues = keys.stream().filter(key -> key.startsWith(headerNamePrefix.toLowerCase()))
-                .map(key -> headers.getFirst(key)).collect(Collectors.toList());
-
-        return Optional.ofNullable(headerValues);
-    }
 }

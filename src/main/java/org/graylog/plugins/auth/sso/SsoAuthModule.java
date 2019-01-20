@@ -17,8 +17,11 @@
 package org.graylog.plugins.auth.sso;
 
 import com.google.inject.Scopes;
+import com.google.inject.multibindings.Multibinder;
 import org.graylog.plugins.auth.sso.audit.SsoAuthAuditEventTypes;
 import org.graylog2.plugin.PluginModule;
+
+import javax.ws.rs.container.DynamicFeature;
 
 /**
  * Extend the PluginModule abstract class here to add you plugin to the system.
@@ -31,5 +34,8 @@ public class SsoAuthModule extends PluginModule {
         addRestResource(SsoConfigResource.class);
         addPermissions(SsoAuthPermissions.class);
         addAuditEventTypes(SsoAuthAuditEventTypes.class);
+
+        Multibinder<Class<? extends DynamicFeature>> setBinder = jerseyDynamicFeatureBinder();
+        setBinder.addBinding().toInstance(SsoSecurityBinding.class);
     }
 }
