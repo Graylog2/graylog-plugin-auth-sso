@@ -35,7 +35,7 @@
     </scm>
 
     <properties>
-        <graylog.version>2.5.0</graylog.version>
+        <graylog.version>2.5.1</graylog.version>
     </properties>
 
     <dependencies>
