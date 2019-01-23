@@ -58,7 +58,11 @@ This project is using Maven 3 and requires Java 8 or higher.
 Plugin Release
 --------------
 
-We are using the maven release plugin:
+- Bump version in `package.json`
+- Bump `graylog.version` in pom.xml
+- Change branch name for the graylog2-server checkout in `.travis.yml`
+
+For the rest we are using the maven release plugin:
 
 ```
 $ mvn release:prepare
