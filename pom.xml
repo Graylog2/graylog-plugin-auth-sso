@@ -8,12 +8,12 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-web-parent</artifactId>
-        <version>2.5.0</version>
+        <version>3.0.0</version>
         <relativePath>../graylog2-server/graylog-plugin-parent/graylog-plugin-web-parent</relativePath>
     </parent>
 
     <artifactId>graylog-plugin-auth-sso</artifactId>
-    <version>2.5.2-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -35,7 +35,7 @@
     </scm>
 
     <properties>
-        <graylog.version>2.5.1</graylog.version>
+        <graylog.version>3.0.0</graylog.version>
     </properties>
 
     <dependencies>

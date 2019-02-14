@@ -12,24 +12,22 @@ const RolesStore = StoreProvider.getStore('Roles')
 
 import ObjectUtils from 'util/ObjectUtils';
 
-const SsoConfiguration = React.createClass({
-  mixins: [
-    Reflux.connect(SsoAuthStore),
-  ],
+class SsoConfiguration extends React.Component {
+  state = {};
 
   componentDidMount() {
-    SsoAuthActions.config();
+    SsoAuthActions.config().then(config => this.setState({ config }));
     RolesStore.loadRoles().done(roles => {
       this.setState({ roles: roles.map(role => role.name) });
     });
-  },
+  }
 
-  _saveSettings(ev) {
+  _saveSettings = (ev) => {
     ev.preventDefault();
     SsoAuthActions.saveConfig(this.state.config);
-  },
+  };
 
-  _setSetting(attribute, value) {
+  _setSetting = (attribute, value) => {
     const newState = {};
 
     // Clone state to not modify it directly
@@ -37,15 +35,15 @@ const SsoConfiguration = React.createClass({
     settings[attribute] = value;
     newState.config = settings;
     this.setState(newState);
-  },
+  };
 
-  _bindChecked(ev, value) {
+  _bindChecked = (ev, value) => {
     this._setSetting(ev.target.name, typeof value === 'undefined' ? ev.target.checked : value);
-  },
+  };
 
-  _bindValue(ev) {
+  _bindValue = (ev) => {
     this._setSetting(ev.target.name, ev.target.value);
-  },
+  };
 
   render() {
     let content;
@@ -159,7 +157,7 @@ const SsoConfiguration = React.createClass({
         {content}
       </div>
     );
-  },
-});
+  }
+}
 
 export default SsoConfiguration;

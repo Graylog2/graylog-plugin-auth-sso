@@ -1,13 +1,13 @@
 {
   "name": "SsoAuthPlugin",
-  "version": "2.5.1",
+  "version": "3.0.0",
   "description": "",
   "repository": {
     "type": "git",
-    "url": "github.com:Graylog2/graylog-plugin-auth-sso"
+    "url": "https://github.com/Graylog2/graylog-plugin-auth-sso"
   },
   "scripts": {
-    "build": "webpack --bail -p"
+    "build": "webpack --bail"
   },
   "keywords": [
     "graylog"
