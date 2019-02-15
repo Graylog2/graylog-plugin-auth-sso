@@ -81,6 +81,7 @@ class SsoConfiguration extends React.Component {
               <fieldset>
                 <legend className="col-sm-12">Security</legend>
                 <Input type="checkbox" label="Request must come from a trusted proxy"
+                       id="require_trusted_proxies"
                        help={subnetHelp}
                        wrapperClassName="col-sm-offset-3 col-sm-9"
                        name="require_trusted_proxies"
@@ -90,6 +91,7 @@ class SsoConfiguration extends React.Component {
               <fieldset>
                 <legend className="col-sm-12">User creation</legend>
                 <Input type="checkbox" label="Automatically create users"
+                       id="auto_create_user"
                        help="Enable this if Graylog should automatically create a user account for externally authenticated users. If disabled, an administrator needs to manually create a user account."
                        wrapperClassName="col-sm-offset-3 col-sm-9"
                        name="auto_create_user"
@@ -124,6 +126,7 @@ class SsoConfiguration extends React.Component {
               <fieldset>
                 <legend className="col-sm-12">Role synchronization</legend>
                 <Input type="checkbox" label="Synchronize the roles of the user from the specified HTTP header"
+                       id="sync_roles"
                        help="Enable this if Graylog should automatically synchronize the roles of the user, with that specified in the HTTP header. Only existing roles in Graylog will be added to the user."
                        wrapperClassName="col-sm-offset-3 col-sm-9"
                        name="sync_roles"
