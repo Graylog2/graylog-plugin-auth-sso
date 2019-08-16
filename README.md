@@ -5,13 +5,14 @@
 This plugins adds SSO (Single Sign-On) capabilities to Graylog. It supports automatic login and user account creation based on trusted HTTP headers set by an authentication proxy.
 
 
-**Required Graylog version:** 3.0.0 and later
+**Required Graylog version:** 3.1.0 and later
 
 Version Compatibility
 ---------------------
 
 | Plugin Version | Graylog Version |
 | -------------- | --------------- |
+| 3.1.x          | 3.1.x           |
 | 3.0.x          | 3.0.x           |
 | 2.5.x          | 2.5.x           |
 | 2.4.x          | 2.4.x           |
@@ -42,7 +43,7 @@ dramatically by making use of hot reloading. To do this, do the following:
 Usage
 -----
 
-How this Plugin can be used is described in [the Graylog Documentation](http://docs.graylog.org/en/2.1/pages/users_and_roles/external_auth.html#single-sign-on)
+How this Plugin can be used is described in [the Graylog Documentation](http://docs.graylog.org/en/stable/pages/users_and_roles/external_auth.html#single-sign-on)
 
 
 Getting started
@@ -60,7 +61,7 @@ Plugin Release
 --------------
 
 - Bump version in `package.json`
-- Bump `graylog.version` in pom.xml
+- Bump parent version and `graylog.version` in pom.xml
 - Change branch name for the graylog2-server checkout in `.travis.yml`
 
 For the rest we are using the maven release plugin:
