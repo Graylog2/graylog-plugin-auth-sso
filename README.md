@@ -68,8 +68,8 @@ For the rest we are using the maven release plugin:
 
 ```
 $ mvn release:prepare
-[...]
-$ mvn release:perform
 ```
+
+(no need for `mvn release:perform`)
 
 This sets the version numbers, creates a tag and pushes to GitHub. Travis CI will build the release artifacts and upload to GitHub automatically.
