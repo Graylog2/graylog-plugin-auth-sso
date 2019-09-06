@@ -1,6 +1,7 @@
 import React from "react";
 import Reflux from "reflux";
-import { Row, Col, Button, Alert } from "react-bootstrap";
+
+import { Row, Col, Button, Alert } from "components/graylog";
 import { Input } from 'components/bootstrap';
 
 import { PageHeader, Spinner } from "components/common";
