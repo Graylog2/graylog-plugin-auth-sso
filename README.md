@@ -45,7 +45,7 @@ dramatically by making use of hot reloading. To do this, do the following:
 Usage
 -----
 
-How this Plugin can be used is described in [the Graylog Documentation](http://docs.graylog.org/en/stable/pages/users_and_roles/external_auth.html#single-sign-on)
+How this Plugin can be used is described in [the Graylog Documentation](http://docs.graylog.org/en/latest/pages/users_and_roles/external_auth.html#single-sign-on)
 
 
 Getting started
