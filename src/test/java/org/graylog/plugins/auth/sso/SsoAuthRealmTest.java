@@ -188,27 +188,6 @@ public class SsoAuthRealmTest {
     }
     
     @Test
-    public void testHeaderValuesCsv() {
-        MultivaluedHashMap<String, String> m = new MultivaluedHashMap<>();
-        m.put("roles", Arrays.asList(new String[]{"role1, role2, role3"}));
-        m.put("roles_1", Arrays.asList(new String[]{"asdf1"}));
-        m.put("roles_2", Arrays.asList(new String[]{"asdf2"}));
-        
-        SsoAuthRealm r = new SsoAuthRealm(null, null, null, null, Collections.emptySet());
-        Optional<List<String>> s = r.headerValues(m, "Roles");
-        Set<String> actual = r.csv(s.get());
-        List<String> expected = Arrays.asList(new String[]{"role1","role2","role3","asdf1","asdf2"});
-        
-        assertEquals(actual.size(), expected.size());
-        for ( String role : expected) {
-            if ( !actual.contains(role)) {
-                fail("Role [" + role + "] expected, but not in result: " + actual);
-            }
-        }
-        
-    }
-    
-    @Test
     public void testSyncRoles() throws Exception {
         List<String> rolesCsv = Arrays.asList(new String[]{"role1","role2", "role3, role4"});
         
