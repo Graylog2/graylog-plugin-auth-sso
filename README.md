@@ -1,3 +1,7 @@
+# Note
+
+This plugin no longer works in recent Graylog versions and is archived. It is provided only for historical purposes in case someone needs access to the source code.
+
 # SSO Authentication Plugin for Graylog
 
 [![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-auth-sso.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-auth-sso)
